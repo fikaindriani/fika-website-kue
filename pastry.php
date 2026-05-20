@@ -1,4 +1,22 @@
-<?php session_start(); ?>
+<?php
+session_start();
+include "koneksi.php";
+
+if(!$conn){
+  die("Koneksi database gagal: " . mysqli_connect_error());
+}
+
+$data = mysqli_query($conn,"
+SELECT * FROM produk
+WHERE id_kategori = 4
+ORDER BY id_produk DESC
+");
+
+if(!$data){
+  die("Query error: " . mysqli_error($conn));
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -212,6 +230,13 @@ body{
   color:white;
 }
 
+.empty{
+  text-align:center;
+  font-size:22px;
+  color:#6d4348;
+  margin-top:50px;
+}
+
 @media(max-width:1100px){
 
   .grid{
@@ -267,10 +292,6 @@ body{
     <a href="index.php#contact">Contact</a>
   </div>
 
-  <div class="cart-box" onclick="goToCart()">
-    <img src="img/cart.png">
-    <span id="cartCount">0</span>
-  </div>
 
 </div>
 
@@ -283,131 +304,51 @@ body{
 
 <div class="grid">
 
+<?php
+if(mysqli_num_rows($data) > 0){
+  while($d = mysqli_fetch_assoc($data)){
+?>
+
 <div class="card">
-<img src="img/croissant.jpg">
+
+<img src="img/<?= $d['foto']; ?>">
 
 <div class="card-content">
-<h3>Butter Croissant</h3>
-<div class="price">Rp25.000</div>
+
+<h3><?= htmlspecialchars($d['nama_kue']); ?></h3>
+
+<div class="price">
+Rp<?= number_format($d['harga']); ?>
+</div>
 
 <div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Butter Croissant',25000,'img/croissant.jpg')">
+
+<button
+class="btn cart-btn"
+onclick='addToCart("<?= htmlspecialchars($d['nama_kue']); ?>", <?= $d['harga']; ?>, "img/<?= $d['foto']; ?>")'>
 Add To Cart
 </button>
 
-<button class="btn detail-btn"
-onclick="showDetail('Butter Croissant',25000,'img/croissant.jpg')">
+<button
+class="btn detail-btn"
+onclick='showDetail("<?= htmlspecialchars($d['nama_kue']); ?>", <?= $d['harga']; ?>, "img/<?= $d['foto']; ?>")'>
 Detail
 </button>
+
 </div>
 </div>
 </div>
 
-<div class="card">
-<img src="img/puff.jpg">
+<?php
+  }
+}else{
+?>
 
-<div class="card-content">
-<h3>Puff Pastry</h3>
-<div class="price">Rp23.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Puff Pastry',23000,'img/puff.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Puff Pastry',23000,'img/puff.jpg')">
-Detail
-</button>
-</div>
-</div>
+<div class="empty">
+🥐 Belum ada produk pastry. Yuk tambah produk baru!
 </div>
 
-<div class="card">
-<img src="img/choco-croissant.jpg">
-
-<div class="card-content">
-<h3>Chocolate Croissant</h3>
-<div class="price">Rp28.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Chocolate Croissant',28000,'img/choco-croissant.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Chocolate Croissant',28000,'img/choco-croissant.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/cheese.jpg">
-
-<div class="card-content">
-<h3>Cheese Puff</h3>
-<div class="price">Rp24.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Cheese Puff',24000,'img/cheese.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Cheese Puff',24000,'img/cheese.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/chicken.jpg">
-
-<div class="card-content">
-<h3>Chicken Puff</h3>
-<div class="price">Rp26.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Chicken Puff',26000,'img/chicken.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Chicken Puff',26000,'img/chicken.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/blueberry.jpg">
-
-<div class="card-content">
-<h3>Blueberry Pastry</h3>
-<div class="price">Rp27.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Blueberry Pastry',27000,'img/blueberry.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Blueberry Pastry',27000,'img/blueberry.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
+<?php } ?>
 
 </div>
 </div>
@@ -415,7 +356,11 @@ Detail
 <script>
 
 function getCart(){
-  return JSON.parse(localStorage.getItem("zeyaCart")) || [];
+  let cart = localStorage.getItem("zeyaCart");
+  if(cart){
+    return JSON.parse(cart);
+  }
+  return [];
 }
 
 function saveCart(cart){
@@ -423,61 +368,44 @@ function saveCart(cart){
 }
 
 function addToCart(name, price, image){
-
   let cart = getCart();
-
-  let existing = cart.find(item =>
-    item.name === name && item.size === "Small"
-  );
-
+  let existing = cart.find(item => item.name === name);
+  
   if(existing){
     existing.quantity += 1;
-  } else {
+  }else{
     cart.push({
-      name:name,
-      image:image,
-      price:price,
-      quantity:1,
-      size:"Small"
+      name: name,
+      image: image,
+      price: price,
+      quantity: 1
     });
   }
-
+  
   saveCart(cart);
-
-  let url = "cart-pastry.php?name="
-          + encodeURIComponent(name)
-          + "&price=" + price
-          + "&image=" + encodeURIComponent(image);
-
-  window.location.href = url;
-
+  updateCartCount();
+  alert(name + " berhasil ditambahkan ke cart 🛒");
 }
 
 function showDetail(name, price, image){
-
-  let url = "cart-pastry.php?name="
-          + encodeURIComponent(name)
-          + "&price=" + price
-          + "&image=" + encodeURIComponent(image);
-
+  let url = "cart-pastry.php?name=" + encodeURIComponent(name) + "&price=" + price + "&image=" + encodeURIComponent(image);
   window.location.href = url;
-
 }
 
 function updateCartCount(){
-
   let cart = getCart();
-
-  let count = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  document.getElementById("cartCount").innerText = count;
-
+  let count = 0;
+  for(let i = 0; i < cart.length; i++){
+    count += cart[i].quantity;
+  }
+  let cartCountElem = document.getElementById("cartCount");
+  if(cartCountElem){
+    cartCountElem.innerText = count;
+  }
 }
 
 function goToCart(){
-
   window.location.href = "cart.php";
-
 }
 
 updateCartCount();
