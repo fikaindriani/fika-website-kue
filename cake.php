@@ -11,7 +11,7 @@ SELECT produk.*, kategori.nama_kategori
 FROM produk
 LEFT JOIN kategori
 ON produk.id_kategori = kategori.id_kategori
-WHERE produk.id_kategori = 5
+WHERE produk.id_kategori = 1
 ORDER BY produk.id_produk DESC
 ");
 
