@@ -1,4 +1,22 @@
-<?php session_start(); ?>
+<?php
+session_start();
+include "koneksi.php";
+
+if(!$conn){
+  die("Koneksi database gagal: " . mysqli_connect_error());
+}
+
+$data = mysqli_query($conn,"
+SELECT * FROM produk
+WHERE id_kategori = 5
+ORDER BY id_produk DESC
+");
+
+if(!$data){
+  die("Query error: " . mysqli_error($conn));
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,39 +92,6 @@ body{
 
 .menu a:hover::after{
   width:100%;
-}
-
-.cart-box{
-  position:relative;
-  cursor:pointer;
-  background:white;
-  padding:10px;
-  border-radius:50%;
-  transition:0.3s;
-}
-
-.cart-box:hover{
-  transform:scale(1.08);
-}
-
-.cart-box img{
-  width:28px;
-}
-
-#cartCount{
-  position:absolute;
-  top:-5px;
-  right:-5px;
-  background:#5a3e2b;
-  color:white;
-  font-size:12px;
-  width:20px;
-  height:20px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
 }
 
 .hero{
@@ -212,6 +197,13 @@ body{
   color:white;
 }
 
+.empty{
+  text-align:center;
+  font-size:22px;
+  color:#6d4348;
+  margin-top:50px;
+}
+
 @media(max-width:1100px){
 
   .grid{
@@ -267,11 +259,6 @@ body{
     <a href="index.php#contact">Contact</a>
   </div>
 
-  <div class="cart-box" onclick="goToCart()">
-    <img src="img/cart.png">
-    <span id="cartCount">0</span>
-  </div>
-
 </div>
 
 <div class="hero">
@@ -283,257 +270,51 @@ body{
 
 <div class="grid">
 
+<?php
+if(mysqli_num_rows($data) > 0){
+  while($d = mysqli_fetch_assoc($data)){
+?>
+
 <div class="card">
-<img src="img/strawberry-cookies.jpg">
+
+<img src="img/<?= $d['foto']; ?>">
 
 <div class="card-content">
-<h3>Strawberry Cookies</h3>
-<div class="price">Rp100.000</div>
+
+<h3><?= htmlspecialchars($d['nama_kue']); ?></h3>
+
+<div class="price">
+Rp<?= number_format($d['harga']); ?>
+</div>
 
 <div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Strawberry Cookies',100000,'img/strawberry-cookies.jpg')">
+
+<button
+class="btn cart-btn"
+onclick='addToCart("<?= htmlspecialchars($d['nama_kue']); ?>", <?= $d['harga']; ?>, "img/<?= $d['foto']; ?>")'>
 Add To Cart
 </button>
 
-<button class="btn detail-btn"
-onclick="showDetail('Strawberry Cookies',100000,'img/strawberry-cookies.jpg')">
+<button
+class="btn detail-btn"
+onclick='showDetail("<?= htmlspecialchars($d['nama_kue']); ?>", <?= $d['harga']; ?>, "img/<?= $d['foto']; ?>")'>
 Detail
 </button>
+
 </div>
 </div>
 </div>
 
-<div class="card">
-<img src="img/berry.jpg">
+<?php
+  }
+}else{
+?>
 
-<div class="card-content">
-<h3>Berry Crunch Cookies</h3>
-<div class="price">Rp110.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Berry Crunch Cookies',110000,'img/berry.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Berry Crunch Cookies',110000,'img/berry.jpg')">
-Detail
-</button>
-</div>
-</div>
+<div class="empty">
+🍪 Belum ada produk cookies. Yuk tambah produk baru!
 </div>
 
-<div class="card">
-<img src="img/lemon.jpg">
-
-<div class="card-content">
-<h3>Lemon Zest Cookies</h3>
-<div class="price">Rp100.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Lemon Zest Cookies',100000,'img/lemon.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Lemon Zest Cookies',100000,'img/lemon.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/double-choco.jpg">
-
-<div class="card-content">
-<h3>Double Choco Chip</h3>
-<div class="price">Rp120.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Double Choco Chip',120000,'img/double-choco.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Double Choco Chip',120000,'img/double-choco.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/choco-melt.jpg">
-
-<div class="card-content">
-<h3>Choco Melt Cookies</h3>
-<div class="price">Rp120.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Choco Melt Cookies',120000,'img/choco-melt.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Choco Melt Cookies',120000,'img/choco-melt.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/dark.jpg">
-
-<div class="card-content">
-<h3>Dark Choco Bites</h3>
-<div class="price">Rp115.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Dark Choco Bites',115000,'img/dark.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Dark Choco Bites',115000,'img/dark.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/caramel.jpg">
-
-<div class="card-content">
-<h3>Caramel Crunch</h3>
-<div class="price">Rp118.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Caramel Crunch',118000,'img/caramel.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Caramel Crunch',118000,'img/caramel.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/honey.jpg">
-
-<div class="card-content">
-<h3>Honey Butter Cookies</h3>
-<div class="price">Rp100.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Honey Butter Cookies',100000,'img/honey.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Honey Butter Cookies',100000,'img/honey.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/vanilla.jpg">
-
-<div class="card-content">
-<h3>Vanilla Sugar Cookies</h3>
-<div class="price">Rp95.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Vanilla Sugar Cookies',95000,'img/vanilla.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Vanilla Sugar Cookies',95000,'img/vanilla.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/velvet.jpg">
-
-<div class="card-content">
-<h3>Velvet Cookies</h3>
-<div class="price">Rp110.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Velvet Cookies',110000,'img/velvet.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Velvet Cookies',110000,'img/velvet.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/matcha-cookie.jpg">
-
-<div class="card-content">
-<h3>Matcha Cookies</h3>
-<div class="price">Rp110.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Matcha Cookies',110000,'img/matcha-cookie.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Matcha Cookies',110000,'img/matcha-cookie.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/pinky.jpg">
-
-<div class="card-content">
-<h3>Pinky Cookies</h3>
-<div class="price">Rp100.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Pinky Cookies',100000,'img/pinky.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Pinky Cookies',100000,'img/pinky.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
+<?php } ?>
 
 </div>
 </div>
@@ -541,7 +322,11 @@ Detail
 <script>
 
 function getCart(){
-  return JSON.parse(localStorage.getItem("zeyaCart")) || [];
+  let cart = localStorage.getItem("zeyaCart");
+  if(cart){
+    return JSON.parse(cart);
+  }
+  return [];
 }
 
 function saveCart(cart){
@@ -549,59 +334,44 @@ function saveCart(cart){
 }
 
 function addToCart(name, price, image){
-
   let cart = getCart();
-
-  let existing = cart.find(item => item.name === name && item.size === "Small");
-
+  let existing = cart.find(item => item.name === name);
+  
   if(existing){
     existing.quantity += 1;
-  } else {
+  }else{
     cart.push({
-      name:name,
-      image:image,
-      price:price,
-      quantity:1,
-      size:"Small"
+      name: name,
+      image: image,
+      price: price,
+      quantity: 1
     });
   }
-
+  
   saveCart(cart);
-
-  let url = "cart-cookies.php?name="
-          + encodeURIComponent(name)
-          + "&price=" + price
-          + "&image=" + encodeURIComponent(image);
-
-  window.location.href = url;
-
+  updateCartCount();
+  alert(name + " berhasil ditambahkan ke cart 🛒");
 }
 
 function showDetail(name, price, image){
-
-  let url = "cart-cookies.php?name="
-          + encodeURIComponent(name)
-          + "&price=" + price
-          + "&image=" + encodeURIComponent(image);
-
+  let url = "cart-cookies.php?name=" + encodeURIComponent(name) + "&price=" + price + "&image=" + encodeURIComponent(image);
   window.location.href = url;
-
 }
 
 function updateCartCount(){
-
   let cart = getCart();
-
-  let count = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  document.getElementById("cartCount").innerText = count;
-
+  let count = 0;
+  for(let i = 0; i < cart.length; i++){
+    count += cart[i].quantity;
+  }
+  let cartCountElem = document.getElementById("cartCount");
+  if(cartCountElem){
+    cartCountElem.innerText = count;
+  }
 }
 
 function goToCart(){
-
   window.location.href = "cart.php";
-
 }
 
 updateCartCount();
