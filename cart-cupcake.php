@@ -1,14 +1,26 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Zeya's Bakery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detail Produk - Zeya's Bakery</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{
+*{
   margin:0;
-  font-family: Georgia, serif;
-  background:#e8bcbc;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins', sans-serif;
+}
+
+body{
+  background:#f8dfe3;
   color:#4a2c2c;
 }
 
@@ -16,104 +28,133 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:15px 40px;
-  background:#d9a5a5;
+  padding:18px 45px;
+  background:rgba(181,124,131,0.95);
+  backdrop-filter:blur(10px);
+  position:sticky;
+  top:0;
+  z-index:999;
+  box-shadow:0 5px 15px rgba(0,0,0,0.08);
 }
 
 .logo{
-  background:#f3d6da;
+  background:white;
+  color:#b57c83;
   padding:10px 20px;
-  border-radius:20px;
-  font-weight:bold;
+  border-radius:50px;
+  font-weight:700;
 }
 
 .menu a{
-  margin:0 15px;
   text-decoration:none;
-  color:#4a2c2c;
-  font-weight:bold;
-}
-
-.nav-right{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.back-btn{
-  background:#c57474;
-  border:none;
-  padding:8px 15px;
-  border-radius:20px;
-  cursor:pointer;
-  font-size:16px;
   color:white;
-  font-weight:bold;
+  margin:0 15px;
+  font-weight:500;
+  position:relative;
 }
 
-.cart-icon{
-  font-size:22px;
-  cursor:pointer;
+.menu a::after{
+  content:'';
+  position:absolute;
+  left:0;
+  bottom:-6px;
+  width:0%;
+  height:3px;
+  background:white;
+  transition:0.3s;
+}
+
+.menu a:hover::after{
+  width:100%;
 }
 
 .container{
   display:grid;
-  grid-template-columns: 300px 1fr 280px;
-  gap:40px;
-  padding:20px 40px 40px;
+  grid-template-columns:1fr 1.2fr;
+  gap:50px;
+  padding:60px;
+  align-items:start;
 }
 
-.product-img img{
+.img-box{
+  background:white;
+  padding:15px;
+  border-radius:25px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+.img-box img{
   width:100%;
+  height:420px;
+  object-fit:cover;
   border-radius:20px;
 }
 
-.size-btn{
-  background:#d88c8c;
-  padding:12px 25px;
+.detail{
+  padding:10px;
+}
+
+.title{
+  font-size:32px;
+  font-weight:700;
+  color:#6d4348;
+  margin-bottom:10px;
+}
+
+.price{
+  font-size:22px;
+  color:#b57c83;
+  font-weight:700;
+  margin-bottom:20px;
+}
+
+.desc{
+  line-height:1.8;
+  margin-bottom:20px;
+  color:#6b4a4a;
+}
+
+.info{
+  background:white;
+  padding:18px;
+  border-radius:20px;
+  margin-bottom:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.05);
+}
+
+.info h4{
+  color:#b57c83;
+  margin-bottom:6px;
+}
+
+.cart-btn{
+  margin-top:20px;
+  background:#b57c83;
+  color:white;
+  border:none;
+  padding:14px 22px;
   border-radius:25px;
-  display:inline-block;
-  margin-right:10px;
+  font-weight:600;
   cursor:pointer;
-}
-
-.size-btn.active{
-  background:#9e5f5f;
-}
-
-.qty{
-  display:flex;
+  transition:0.3s;
+  display:inline-flex;
   align-items:center;
-  justify-content:center;
-  gap:15px;
-  margin:20px 0;
+  gap:8px;
 }
 
-.qty button{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  border:none;
-  font-size:20px;
-  cursor:pointer;
+.cart-btn:hover{
+  background:#6d4348;
+  transform:translateY(-2px);
 }
 
-.checkout{
-  text-align:center;
-}
-
-.checkout button{
-  background:#d88c8c;
-  border:none;
-  padding:12px 30px;
-  border-radius:25px;
-  cursor:pointer;
-}
-
-.divider{
-  height:4px;
-  background:#3a1f1f;
-  margin:30px 0;
+@media(max-width:900px){
+  .container{
+    grid-template-columns:1fr;
+    padding:25px;
+  }
+  .img-box img{
+    height:300px;
+  }
 }
 </style>
 </head>
@@ -121,117 +162,65 @@ body{
 <body>
 
 <div class="navbar">
-  <div class="logo">Zeya’s Bakery</div>
-
+  <div class="logo">🧁 Zeya's Bakery</div>
   <div class="menu">
     <a href="index.php">Home</a>
     <a href="index.php#categories">Categories</a>
     <a href="index.php#about">About</a>
     <a href="index.php#contact">Contact</a>
   </div>
-
-  <div class="nav-right">
-    <button onclick="goBack()" class="back-btn">← Back</button>
-    <div onclick="goCart()" class="cart-icon">🛒</div>
-  </div>
 </div>
 
-<h1 id="productTitle" style="padding-left:40px;"></h1>
-
 <div class="container">
-
-  <div class="product-img">
-    <img id="productImage">
+  <div class="img-box">
+    <img id="img">
   </div>
-
-  <div>
-    <p>Small – Rp 100.000</p>
-    <p>Medium – Rp 130.000</p>
-    <p>Large – Rp 170.000</p>
-
-    <div class="divider"></div>
-
-    <h2>SIZE</h2>
-
-    <div>
-      <span class="size-btn active" onclick="setSize(100000,this)">Small</span>
-      <span class="size-btn" onclick="setSize(130000,this)">Medium</span>
-      <span class="size-btn" onclick="setSize(170000,this)">Large</span>
+  <div class="detail">
+    <div class="title" id="name">Produk</div>
+    <div class="price" id="price">Rp 0</div>
+    <div class="desc">
+      Produk bakery premium homemade dengan bahan berkualitas tinggi,
+      fresh setiap hari, tekstur lembut dan rasa seimbang.
     </div>
-  </div>
-
-  <div class="checkout">
-    <h2>Quantity</h2>
-
-    <div class="qty">
-      <button onclick="minus()">-</button>
-      <span id="qty">1</span>
-      <button onclick="plus()">+</button>
+    <div class="info">
+      <h4>Deskripsi</h4>
+      Dibuat tanpa pengawet dan cocok untuk semua kalangan.
     </div>
-
-    <button onclick="addToCart()">Cek Out</button>
-
-    <p>Subtotal</p>
-    <h2 id="subtotal">Rp 100.000</h2>
+    <div class="info">
+      <h4>Keunggulan</h4>
+      ✔ Fresh daily<br>
+      ✔ Handmade<br>
+      ✔ Premium ingredients
+    </div>
+    <button class="cart-btn" onclick="addToCart()">
+      🛒 Add To Cart
+    </button>
   </div>
-
 </div>
 
 <script>
-let price = 100000;
-let qty = 1;
+const url = new URLSearchParams(window.location.search);
 
-const urlParams = new URLSearchParams(window.location.search);
-
-const product = {
-  name: urlParams.get("name"),
-  image: urlParams.get("image"),
-  basePrice: parseInt(urlParams.get("price")) || 100000
-};
-
-document.getElementById("productTitle").innerText = product.name;
-document.getElementById("productImage").src = product.image;
-
-function formatRupiah(angka){
-  return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
-
-function setSize(newPrice, el){
-  price = newPrice;
-  document.querySelectorAll(".size-btn").forEach(b=>b.classList.remove("active"));
-  el.classList.add("active");
-  update();
-}
-
-function plus(){ qty++; update(); }
-
-function minus(){
-  if(qty > 1){ qty--; update(); }
-}
-
-function update(){
-  document.getElementById("qty").innerText = qty;
-  document.getElementById("subtotal").innerText = "Rp " + formatRupiah(price * qty);
-}
+document.getElementById("name").innerText = url.get("name") || "Produk";
+document.getElementById("img").src = url.get("image") || "img/default.jpg";
+document.getElementById("price").innerText = "Rp " + (parseInt(url.get("price") || 0)).toLocaleString("id-ID");
 
 function addToCart(){
-  let size = document.querySelector(".size-btn.active").innerText;
-
-  let url = "payment.php?name=" + encodeURIComponent(product.name)
-          + "&image=" + encodeURIComponent(product.image)
-          + "&price=" + price
-          + "&qty=" + qty
-          + "&size=" + encodeURIComponent(size);
-
-  window.location.href = url;
-}
-
-function goCart(){
-  window.location.href = "cart-cupcake.php";
-}
-
-function goBack(){
-  window.location.href = "cupcake.php";
+  let item = {
+    name: document.getElementById("name").innerText,
+    price: parseInt(document.getElementById("price").innerText.replace(/\D/g,'')),
+    image: document.getElementById("img").src,
+    quantity: 1
+  };
+  let cart = JSON.parse(localStorage.getItem("zeyaCart")) || [];
+  let existing = cart.find(p => p.name === item.name);
+  if(existing){
+    existing.quantity += 1;
+  } else {
+    cart.push(item);
+  }
+  localStorage.setItem("zeyaCart", JSON.stringify(cart));
+  alert("Berhasil ditambahkan ke cart 🛒");
 }
 </script>
 
