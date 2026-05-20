@@ -7,9 +7,12 @@ if(!$conn){
 }
 
 $data = mysqli_query($conn,"
-SELECT * FROM produk
-WHERE id_kategori = 5
-ORDER BY id_produk DESC
+SELECT produk.*, kategori.nama_kategori
+FROM produk
+LEFT JOIN kategori
+ON produk.id_kategori = kategori.id_kategori
+WHERE produk.id_kategori = 5
+ORDER BY produk.id_produk DESC
 ");
 
 if(!$data){
