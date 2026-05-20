@@ -4,12 +4,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cart - Zeya's Bakery</title>
+<title>Detail Produk - Zeya's Bakery</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-
 *{
   margin:0;
   padding:0;
@@ -66,404 +65,157 @@ body{
   width:100%;
 }
 
-.nav-right{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.back-btn{
-  background:white;
-  border:none;
-  padding:10px 18px;
-  border-radius:30px;
-  cursor:pointer;
-  font-weight:600;
-  color:#b57c83;
-  transition:0.3s;
-}
-
-.back-btn:hover{
-  background:#6d4348;
-  color:white;
-}
-
 .container{
-  padding:50px;
+  display:grid;
+  grid-template-columns:1fr 1.2fr;
+  gap:50px;
+  padding:60px;
+  align-items:start;
 }
 
-.title{
-  text-align:center;
-  font-size:35px;
-  color:#6d4348;
-  margin-bottom:35px;
-  font-weight:700;
-}
-
-.cart-item{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
+.img-box{
   background:white;
-  padding:20px;
+  padding:15px;
   border-radius:25px;
-  margin-bottom:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.06);
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
 }
 
-.left{
-  display:flex;
-  align-items:center;
-  gap:20px;
-}
-
-.left img{
-  width:120px;
-  height:120px;
+.img-box img{
+  width:100%;
+  height:420px;
   object-fit:cover;
   border-radius:20px;
 }
 
-.info h3{
+.detail{
+  padding:10px;
+}
+
+.title{
+  font-size:32px;
+  font-weight:700;
+  color:#6d4348;
+  margin-bottom:10px;
+}
+
+.price{
   font-size:22px;
-  color:#6d4348;
-  margin-bottom:8px;
-}
-
-.info p{
-  color:#7a5b5b;
-  margin:5px 0;
-}
-
-.qty-box{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.qty-btn{
-  width:40px;
-  height:40px;
-  border:none;
-  border-radius:50%;
-  background:#b57c83;
-  color:white;
-  font-size:20px;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-.qty-btn:hover{
-  background:#6d4348;
-}
-
-.qty-number{
-  font-size:20px;
-  font-weight:600;
-}
-
-.subtotal{
-  text-align:right;
-}
-
-.subtotal h3{
   color:#b57c83;
-  margin-top:8px;
-}
-
-.bottom-box{
-  margin-top:40px;
-  background:white;
-  padding:30px;
-  border-radius:25px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.06);
-  text-align:center;
-}
-
-.total{
-  font-size:30px;
-  color:#6d4348;
   font-weight:700;
   margin-bottom:20px;
 }
 
-.checkout-btn{
+.desc{
+  line-height:1.8;
+  margin-bottom:20px;
+  color:#6b4a4a;
+}
+
+.info{
+  background:white;
+  padding:18px;
+  border-radius:20px;
+  margin-bottom:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.05);
+}
+
+.info h4{
+  color:#b57c83;
+  margin-bottom:6px;
+}
+
+.cart-btn{
+  margin-top:20px;
   background:#b57c83;
   color:white;
   border:none;
-  padding:15px 30px;
-  border-radius:30px;
-  font-size:17px;
+  padding:14px 22px;
+  border-radius:25px;
   font-weight:600;
   cursor:pointer;
   transition:0.3s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
 }
 
-.checkout-btn:hover{
+.cart-btn:hover{
   background:#6d4348;
   transform:translateY(-2px);
 }
 
-.empty{
-  text-align:center;
-  padding:60px;
-  background:white;
-  border-radius:25px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.06);
-}
-
 @media(max-width:900px){
-
   .container{
+    grid-template-columns:1fr;
     padding:25px;
   }
-
-  .cart-item{
-    flex-direction:column;
-    align-items:flex-start;
+  .img-box img{
+    height:300px;
   }
-
-  .left{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .navbar{
-    flex-direction:column;
-    gap:15px;
-  }
-
 }
-
 </style>
 </head>
-
 <body>
 
 <div class="navbar">
-
-  <div class="logo">
-    🍪 Zeya's Bakery
-  </div>
-
+  <div class="logo">🍪 Zeya's Bakery</div>
   <div class="menu">
     <a href="index.php">Home</a>
     <a href="index.php#categories">Categories</a>
     <a href="index.php#about">About</a>
     <a href="index.php#contact">Contact</a>
   </div>
-
-  <div class="nav-right">
-
-    <button onclick="goBack()" class="back-btn">
-      ← Back
-    </button>
-
-  </div>
-
 </div>
 
 <div class="container">
-
-  <div class="title">
-    🛒 Cart Kamu
+  <div class="img-box">
+    <img id="img">
   </div>
-
-  <div id="cartContainer"></div>
-
-  <div class="bottom-box">
-
-    <div class="total">
-      Total : Rp <span id="total">0</span>
+  <div class="detail">
+    <div class="title" id="name">Produk</div>
+    <div class="price" id="price">Rp 0</div>
+    <div class="desc">
+      Produk bakery premium homemade dengan bahan berkualitas tinggi,
+      fresh setiap hari, tekstur lembut dan rasa seimbang.
     </div>
-
-    <button class="checkout-btn" onclick="checkout()">
-      Checkout Sekarang
-    </button>
-
+    <div class="info">
+      <h4>Deskripsi</h4>
+      Dibuat tanpa pengawet dan cocok untuk semua kalangan.
+    </div>
+    <div class="info">
+      <h4>Keunggulan</h4>
+      ✔ Fresh daily<br>
+      ✔ Handmade<br>
+      ✔ Premium ingredients
+    </div>
+    <button class="cart-btn" onclick="addToCart()">🛒 Add To Cart</button>
   </div>
-
 </div>
 
 <script>
+const url = new URLSearchParams(window.location.search);
 
-function getCart(){
+document.getElementById("name").innerText = url.get("name") || "Produk";
+document.getElementById("img").src = url.get("image") || "img/default.jpg";
+document.getElementById("price").innerText = "Rp " + (parseInt(url.get("price") || 0)).toLocaleString("id-ID");
 
-  return JSON.parse(
-    localStorage.getItem("zeyaCart")
-  ) || [];
-
-}
-
-function saveCart(cart){
-
-  localStorage.setItem(
-    "zeyaCart",
-    JSON.stringify(cart)
-  );
-
-}
-
-function formatRupiah(angka){
-
-  return angka.toString().replace(
-    /\B(?=(\d{3})+(?!\d))/g,
-    "."
-  );
-
-}
-
-function renderCart(){
-
-  let cart = getCart();
-
-  let container =
-  document.getElementById("cartContainer");
-
-  container.innerHTML = "";
-
-  let total = 0;
-
-  if(cart.length === 0){
-
-    container.innerHTML = `
-      <div class="empty">
-        <h2>Cart masih kosong 🥺</h2>
-      </div>
-    `;
-
-    document.getElementById("total").innerText = "0";
-
-    return;
-
-  }
-
-  cart.forEach((item,index)=>{
-
-    let subtotal =
-    item.price * item.quantity;
-
-    total += subtotal;
-
-    container.innerHTML += `
-
-      <div class="cart-item">
-
-        <div class="left">
-
-          <img src="${item.image}">
-
-          <div class="info">
-
-            <h3>${item.name}</h3>
-
-            <p>
-              Harga :
-              Rp ${formatRupiah(item.price)}
-            </p>
-
-            <p>
-              Stok :
-              ${item.stok || 20}
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="qty-box">
-
-          <button
-          class="qty-btn"
-          onclick="minus(${index})">
-            -
-          </button>
-
-          <div class="qty-number">
-            ${item.quantity}
-          </div>
-
-          <button
-          class="qty-btn"
-          onclick="plus(${index})">
-            +
-          </button>
-
-        </div>
-
-        <div class="subtotal">
-
-          <p>Subtotal</p>
-
-          <h3>
-            Rp ${formatRupiah(subtotal)}
-          </h3>
-
-        </div>
-
-      </div>
-
-    `;
-
-  });
-
-  document.getElementById("total").innerText =
-  formatRupiah(total);
-
-}
-
-function plus(i){
-
-  let cart = getCart();
-
-  cart[i].quantity++;
-
-  saveCart(cart);
-
-  renderCart();
-
-}
-
-function minus(i){
-
-  let cart = getCart();
-
-  if(cart[i].quantity > 1){
-
-    cart[i].quantity--;
-
+function addToCart(){
+  let item = {
+    name: document.getElementById("name").innerText,
+    price: parseInt(document.getElementById("price").innerText.replace(/\D/g,'')),
+    image: document.getElementById("img").src,
+    quantity: 1
+  };
+  let cart = JSON.parse(localStorage.getItem("zeyaCart")) || [];
+  let existing = cart.find(p => p.name === item.name);
+  if(existing){
+    existing.quantity += 1;
   } else {
-
-    cart.splice(i,1);
-
+    cart.push(item);
   }
-
-  saveCart(cart);
-
-  renderCart();
-
+  localStorage.setItem("zeyaCart", JSON.stringify(cart));
+  alert("Berhasil ditambahkan ke cart 🛒");
 }
-
-function checkout(){
-
-  alert("Checkout berhasil 🛒✨");
-
-  localStorage.removeItem("zeyaCart");
-
-  renderCart();
-
-}
-
-function goBack(){
-
-  window.history.back();
-
-}
-
-renderCart();
-
 </script>
-
 </body>
 </html>
