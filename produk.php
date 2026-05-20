@@ -1,66 +1,52 @@
 <?php
 $conn = mysqli_connect("localhost","root","","db_kue");
 
-if(isset($_POST['tambah_produk'])){
+if(!$conn){
+  die("Koneksi gagal");
+}
 
-  $nama_kue   = $_POST['nama_kue'];
-  $harga      = $_POST['harga'];
-  $stok       = $_POST['stok'];
-  $deskripsi  = $_POST['deskripsi'];
-  $id_kategori= $_POST['id_kategori'];
+if(isset($_POST['ajax_tambah_produk'])){
+
+  $nama_kue    = $_POST['nama_kue'];
+  $harga       = $_POST['harga'];
+  $stok        = $_POST['stok'];
+  $deskripsi   = $_POST['deskripsi'];
+  $id_kategori = $_POST['id_kategori'];
 
   $foto = $_FILES['foto']['name'];
   $tmp  = $_FILES['foto']['tmp_name'];
 
+  $namaFoto = "";
+
   if($foto != ""){
-
     $namaFoto = time()."_".$foto;
-
-    move_uploaded_file(
-      $tmp,
-      "img/".$namaFoto
-    );
-
-  }else{
-
-    $namaFoto = "";
-
+    move_uploaded_file($tmp, "img/".$namaFoto);
   }
 
-  mysqli_query($conn,"
-  INSERT INTO produk
-  (
-    nama_kue,
-    harga,
-    stok,
-    foto,
-    deskripsi,
-    id_kategori
-  )
-  VALUES
-  (
-    '$nama_kue',
-    '$harga',
-    '$stok',
-    '$namaFoto',
-    '$deskripsi',
-    '$id_kategori'
-  )
-  ");
-
-  header("Location: produk.php");
+  $query = "INSERT INTO produk (nama_kue, harga, stok, foto, deskripsi, id_kategori) 
+            VALUES ('$nama_kue', '$harga', '$stok', '$namaFoto', '$deskripsi', '$id_kategori')";
+  
+  if(mysqli_query($conn, $query)){
+    echo json_encode(['success' => true, 'id_kategori' => $id_kategori]);
+  } else {
+    echo json_encode(['success' => false, 'error' => mysqli_error($conn)]);
+  }
+  exit();
 }
 
 if(isset($_POST['update_stok'])){
 
   $id_produk = $_POST['id_produk'];
-  $stok = $_POST['stok'];
+  $stok      = $_POST['stok'];
 
   mysqli_query($conn,"
   UPDATE produk
   SET stok='$stok'
   WHERE id_produk='$id_produk'
   ");
+
+  header("Location: produk.php");
+  exit();
 }
 
 if(isset($_GET['hapus'])){
@@ -73,6 +59,7 @@ if(isset($_GET['hapus'])){
   ");
 
   header("Location: produk.php");
+  exit();
 }
 
 if(isset($_POST['edit_produk'])){
@@ -92,6 +79,7 @@ if(isset($_POST['edit_produk'])){
   ");
 
   header("Location: produk.php");
+  exit();
 }
 
 $data = mysqli_query($conn,"
@@ -99,10 +87,6 @@ SELECT produk.*, kategori.nama_kategori
 FROM produk
 LEFT JOIN kategori
 ON produk.id_kategori = kategori.id_kategori
-");
-
-$kategori = mysqli_query($conn,"
-SELECT * FROM kategori
 ");
 
 $editData = null;
@@ -259,6 +243,7 @@ td{
   display:flex;
   justify-content:center;
   align-items:center;
+  z-index:999;
 }
 
 .modal-box{
@@ -295,6 +280,61 @@ img{
   border-radius:10px;
 }
 
+.notif-success{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:#4CAF50;
+  color:white;
+  padding:15px 20px;
+  border-radius:10px;
+  z-index:1000;
+  animation:slideIn 0.3s ease;
+}
+
+.notif-error{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:#f44336;
+  color:white;
+  padding:15px 20px;
+  border-radius:10px;
+  z-index:1000;
+  animation:slideIn 0.3s ease;
+}
+
+@keyframes slideIn{
+  from{
+    transform:translateX(100%);
+    opacity:0;
+  }
+  to{
+    transform:translateX(0);
+    opacity:1;
+  }
+}
+
+/* Loading spinner */
+.loading{
+  display:inline-block;
+  width:20px;
+  height:20px;
+  border:3px solid white;
+  border-radius:50%;
+  border-top-color:transparent;
+  animation:spin 0.6s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
+
+.btn-loading{
+  opacity:0.7;
+  cursor:not-allowed;
+}
+
 </style>
 </head>
 
@@ -302,41 +342,30 @@ img{
 
 <div class="navbar">
 
-  <div class="nav-left">
+<div class="nav-left">
 
-    <a href="dashboard-admin.php">
-      DASHBOARD
-    </a>
+<a href="dashboard-admin.php">DASHBOARD</a>
 
-    <a href="produk.php" class="active">
-      MANAJEMEN PRODUK
-    </a>
+<a href="produk.php" class="active">
+MANAJEMEN PRODUK
+</a>
 
-    <a href="pesanan.php">
-      MANAJEMEN PESANAN
-    </a>
+<a href="pesanan.php">MANAJEMEN PESANAN</a>
 
-    <a href="detail_pesanan.php">
-      DETAIL PESANAN
-    </a>
+<a href="detail_pesanan.php">DETAIL PESANAN</a>
 
-    <a href="kategori.php">
-      KATEGORI
-    </a>
+<a href="kategori.php">KATEGORI</a>
 
-    <a href="logout.php">
-      LOGOUT
-    </a>
+<a href="logout.php">LOGOUT</a>
 
-  </div>
-
+</div>
 </div>
 
 <div class="container">
 
 <div class="top-bar">
 
-<a href="produk.php?tambah=1" class="add-btn">
+<a href="javascript:void(0)" onclick="openModal()" class="add-btn">
 + Tambah Produk
 </a>
 
@@ -358,29 +387,21 @@ img{
 
 </thead>
 
-<tbody>
+<tbody id="tableBody">
 
 <?php while($d = mysqli_fetch_assoc($data)) { ?>
 
 <tr>
 
 <td>
-
 <?php if($d['foto'] != ""){ ?>
-
 <img src="img/<?= $d['foto']; ?>">
-
 <?php } ?>
-
 </td>
 
-<td>
-<?= $d['nama_kue']; ?>
-</td>
+<td><?= $d['nama_kue']; ?></td>
 
-<td>
-<?= $d['nama_kategori']; ?>
-</td>
+<td><?= $d['nama_kategori']; ?></td>
 
 <td>
 Rp <?= number_format($d['harga']); ?>
@@ -419,15 +440,11 @@ Simpan
 
 <?php if($d['stok'] <= 0){ ?>
 
-<span class="habis">
-HABIS
-</span>
+<span class="habis">HABIS</span>
 
 <?php } else { ?>
 
-<span class="tersedia">
-TERSEDIA
-</span>
+<span class="tersedia">TERSEDIA</span>
 
 <?php } ?>
 
@@ -460,18 +477,17 @@ Hapus
 
 </div>
 
-<?php if(isset($_GET['tambah'])) { ?>
-
-<div class="modal">
+<div id="modalTambah" class="modal" style="display:none;">
 
 <div class="modal-box">
 
 <h2>Tambah Produk</h2>
 
-<form method="POST" enctype="multipart/form-data">
+<form id="formTambahProduk" enctype="multipart/form-data">
 
 <input
 type="text"
+id="nama_kue"
 name="nama_kue"
 placeholder="Nama Produk"
 required
@@ -479,6 +495,7 @@ required
 
 <input
 type="number"
+id="harga"
 name="harga"
 placeholder="Harga"
 required
@@ -486,17 +503,19 @@ required
 
 <input
 type="number"
+id="stok"
 name="stok"
 placeholder="Stok"
 required
 >
 
 <textarea
+id="deskripsi"
 name="deskripsi"
 placeholder="Deskripsi Produk">
 </textarea>
 
-<select name="id_kategori" required>
+<select id="id_kategori" name="id_kategori" required>
 
 <option value="">
 Pilih Kategori
@@ -520,102 +539,122 @@ while($k = mysqli_fetch_assoc($kat)){
 
 <input
 type="file"
+id="foto"
 name="foto"
 required
 >
 
 <button
-type="submit"
-name="tambah_produk"
-class="save-btn">
+type="button"
+id="btnSubmit"
+onclick="submitProduk()"
+class="action-btn save-btn">
 Tambah Produk
 </button>
 
-<a
-href="produk.php"
+<button
+type="button"
+onclick="closeModal()"
 class="action-btn delete-btn">
 Batal
-</a>
-
-</form>
-
-</div>
-
-</div>
-
-<?php } ?>
-
-<?php if($editData) { ?>
-
-<div class="modal">
-
-<div class="modal-box">
-
-<h2>Edit Produk</h2>
-
-<form method="POST">
-
-<input
-type="hidden"
-name="id_produk"
-value="<?= $editData['id_produk']; ?>"
->
-
-<input
-type="text"
-name="nama_kue"
-value="<?= $editData['nama_kue']; ?>"
-required
->
-
-<input
-type="number"
-name="harga"
-value="<?= $editData['harga']; ?>"
-required
->
-
-<select name="id_kategori" required>
-
-<?php
-$kat2 = mysqli_query($conn,"
-SELECT * FROM kategori
-");
-
-while($k2 = mysqli_fetch_assoc($kat2)){
-?>
-
-<option
-value="<?= $k2['id_kategori']; ?>"
-<?= $k2['id_kategori'] == $editData['id_kategori'] ? "selected" : ""; ?>
->
-<?= $k2['nama_kategori']; ?>
-</option>
-
-<?php } ?>
-
-</select>
-
-<button
-type="submit"
-name="edit_produk"
-class="save-btn">
-Simpan Perubahan
 </button>
 
-<a
-href="produk.php"
-class="action-btn delete-btn">
-Batal
-</a>
-
 </form>
 
 </div>
 
 </div>
 
+<?php if($editData) { ?>
+<div class="modal">
+<div class="modal-box">
+<h2>Edit Produk</h2>
+<form method="POST">
+<input type="hidden" name="id_produk" value="<?= $editData['id_produk']; ?>">
+<input type="text" name="nama_kue" value="<?= $editData['nama_kue']; ?>" required>
+<input type="number" name="harga" value="<?= $editData['harga']; ?>" required>
+<select name="id_kategori" required>
+<?php
+$kat2 = mysqli_query($conn,"SELECT * FROM kategori");
+while($k2 = mysqli_fetch_assoc($kat2)){
+?>
+<option value="<?= $k2['id_kategori']; ?>" <?= $k2['id_kategori'] == $editData['id_kategori'] ? "selected" : ""; ?>>
+<?= $k2['nama_kategori']; ?>
+</option>
 <?php } ?>
+</select>
+<button type="submit" name="edit_produk" class="save-btn">Simpan Perubahan</button>
+<a href="produk.php" class="action-btn delete-btn">Batal</a>
+</form>
+</div>
+</div>
+<?php } ?>
+
+<script>
+function openModal(){
+  document.getElementById('modalTambah').style.display = 'flex';
+}
+
+function closeModal(){
+  document.getElementById('modalTambah').style.display = 'none';
+  document.getElementById('formTambahProduk').reset();
+}
+
+function submitProduk(){
+  var form = document.getElementById('formTambahProduk');
+  var formData = new FormData(form);
+  formData.append('ajax_tambah_produk', '1');
+  
+  var btn = document.getElementById('btnSubmit');
+  var originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="loading"></span> Menyimpan...';
+  btn.disabled = true;
+  btn.classList.add('btn-loading');
+  
+  fetch('produk.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if(data.success){
+      showNotification('Produk berhasil ditambahkan!', 'success');
+      
+      closeModal();
+      
+      document.getElementById('formTambahProduk').reset();
+      
+      setTimeout(function(){
+        location.reload();
+      }, 1500);
+      
+    } else {
+      // Tampilkan notif error
+      showNotification('Gagal menambahkan produk: ' + data.error, 'error');
+    }
+  })
+  .catch(error => {
+    showNotification('Terjadi kesalahan: ' + error, 'error');
+  })
+  .finally(function(){
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+  });
+}
+
+function showNotification(message, type){
+  var notif = document.createElement('div');
+  notif.className = type === 'success' ? 'notif-success' : 'notif-error';
+  notif.innerHTML = message;
+  document.body.appendChild(notif);
+  
+  setTimeout(function(){
+    notif.remove();
+  }, 3000);
+}
+
+</script>
 
 </body>
 </html>
