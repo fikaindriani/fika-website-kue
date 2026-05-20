@@ -1,4 +1,22 @@
-<?php session_start(); ?>
+<?php
+session_start();
+include "koneksi.php";
+
+if(!$conn){
+  die("Koneksi database gagal: " . mysqli_connect_error());
+}
+
+$data = mysqli_query($conn,"
+SELECT * FROM produk
+WHERE id_kategori = 6
+ORDER BY id_produk DESC
+");
+
+if(!$data){
+  die("Query error: " . mysqli_error($conn));
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +38,7 @@
 body{
   font-family:'Poppins', sans-serif;
   background:#f8dfe3;
+  overflow-x:hidden;
 }
 
 .navbar{
@@ -28,10 +47,11 @@ body{
   align-items:center;
   padding:18px 45px;
   background:rgba(181,124,131,0.95);
+  backdrop-filter:blur(10px);
   position:sticky;
   top:0;
   z-index:999;
-  backdrop-filter:blur(10px);
+  box-shadow:0 5px 15px rgba(0,0,0,0.08);
 }
 
 .logo{
@@ -40,11 +60,13 @@ body{
   padding:10px 20px;
   border-radius:50px;
   font-weight:700;
+  font-size:18px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.08);
 }
 
 .menu{
   display:flex;
-  gap:30px;
+  gap:35px;
   flex-wrap:wrap;
 }
 
@@ -52,105 +74,107 @@ body{
   text-decoration:none;
   color:white;
   font-weight:500;
-}
-
-.cart-box{
   position:relative;
-  cursor:pointer;
-  background:white;
-  padding:10px;
-  border-radius:50%;
+  transition:0.3s;
 }
 
-.cart-box img{
-  width:28px;
-}
-
-#cartCount{
+.menu a::after{
+  content:'';
   position:absolute;
-  top:-5px;
-  right:-5px;
-  background:#5a3e2b;
-  color:white;
-  font-size:12px;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  left:0;
+  bottom:-6px;
+  width:0%;
+  height:3px;
+  background:white;
+  border-radius:10px;
+  transition:0.3s;
+}
+
+.menu a:hover::after{
+  width:100%;
 }
 
 .hero{
   text-align:center;
-  padding:60px 20px 40px;
+  padding:70px 20px 50px;
 }
 
 .hero h1{
-  font-size:40px;
+  font-size:55px;
   color:#6d4348;
+  margin-bottom:15px;
 }
 
 .hero p{
   color:#7d5a5f;
-  margin-top:10px;
+  font-size:18px;
 }
 
 .container{
-  padding:20px 40px 60px;
+  padding:20px 50px 70px;
 }
 
 .grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:30px;
+  gap:40px;
 }
 
 .card{
   background:white;
-  border-radius:20px;
+  border-radius:28px;
   overflow:hidden;
   box-shadow:0 10px 25px rgba(0,0,0,0.08);
-  transition:0.3s;
+  transition:0.4s;
 }
 
 .card:hover{
-  transform:translateY(-8px);
+  transform:translateY(-10px);
+  box-shadow:0 18px 40px rgba(0,0,0,0.12);
 }
 
 .card img{
   width:100%;
-  height:280px;
+  height:320px;
   object-fit:cover;
+  transition:0.4s;
+}
+
+.card:hover img{
+  transform:scale(1.05);
 }
 
 .card-content{
-  padding:20px;
+  padding:25px;
 }
 
 .card h3{
   color:#6d4348;
-  margin-bottom:10px;
+  margin-bottom:12px;
+  font-size:24px;
 }
 
 .price{
   color:#b57c83;
   font-weight:700;
-  margin-bottom:15px;
+  margin-bottom:22px;
+  font-size:22px;
 }
 
 .btn-group{
   display:flex;
-  gap:10px;
+  gap:12px;
 }
 
 .btn{
   flex:1;
-  padding:10px;
+  padding:14px;
   border:none;
-  border-radius:12px;
+  border-radius:16px;
   cursor:pointer;
   font-weight:600;
+  font-size:15px;
+  transition:0.3s;
 }
 
 .cart-btn{
@@ -158,14 +182,14 @@ body{
   color:white;
 }
 
-.detail-btn{
-  background:white;
-  border:2px solid #b57c83;
-  color:#b57c83;
-}
-
 .cart-btn:hover{
   background:#5a3e2b;
+}
+
+.detail-btn{
+  background:white;
+  color:#b57c83;
+  border:2px solid #b57c83;
 }
 
 .detail-btn:hover{
@@ -173,13 +197,50 @@ body{
   color:white;
 }
 
-@media(max-width:900px){
-  .grid{ grid-template-columns:repeat(2,1fr); }
+.empty{
+  text-align:center;
+  font-size:22px;
+  color:#6d4348;
+  margin-top:50px;
 }
 
-@media(max-width:600px){
-  .grid{ grid-template-columns:1fr; }
-  .navbar{ flex-direction:column; gap:10px; }
+@media(max-width:1100px){
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:700px){
+
+  .navbar{
+    flex-direction:column;
+    gap:15px;
+    padding:20px;
+  }
+
+  .menu{
+    justify-content:center;
+    gap:20px;
+  }
+
+  .hero h1{
+    font-size:38px;
+  }
+
+  .container{
+    padding:20px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .btn-group{
+    flex-direction:column;
+  }
+
 }
 
 </style>
@@ -189,19 +250,13 @@ body{
 
 <div class="navbar">
 
-  <div class="logo">Zeya's Bakery</div>
+  <div class="logo">🎁 Zeya's Bakery</div>
 
   <div class="menu">
     <a href="index.php">Home</a>
     <a href="index.php#categories">Categories</a>
-
     <a href="index.php#about">About</a>
     <a href="index.php#contact">Contact</a>
-  </div>
-
-  <div class="cart-box" onclick="goToCart()">
-    <img src="img/cart.png">
-    <span id="cartCount">0</span>
   </div>
 
 </div>
@@ -215,77 +270,51 @@ body{
 
 <div class="grid">
 
+<?php
+if(mysqli_num_rows($data) > 0){
+  while($d = mysqli_fetch_assoc($data)){
+?>
+
 <div class="card">
-<img src="img/nastar.jpg">
+
+<img src="img/<?= $d['foto']; ?>">
+
 <div class="card-content">
-<h3>Nastar Premium</h3>
-<div class="price">Rp80.000</div>
+
+<h3><?= htmlspecialchars($d['nama_kue']); ?></h3>
+
+<div class="price">
+Rp<?= number_format($d['harga']); ?>
+</div>
+
 <div class="btn-group">
-<button class="btn cart-btn" onclick="addToCart('Nastar Premium',80000,'img/nastar.jpg')">Add</button>
-<button class="btn detail-btn" onclick="showDetail('Nastar Premium',80000,'img/nastar.jpg')">Detail</button>
+
+<button
+class="btn cart-btn"
+onclick='addToCart("<?= htmlspecialchars($d['nama_kue']); ?>", <?= $d['harga']; ?>, "img/<?= $d['foto']; ?>")'>
+Add To Cart
+</button>
+
+<button
+class="btn detail-btn"
+onclick='showDetail("<?= htmlspecialchars($d['nama_kue']); ?>", <?= $d['harga']; ?>, "img/<?= $d['foto']; ?>")'>
+Detail
+</button>
+
 </div>
 </div>
 </div>
 
-<div class="card">
-<img src="img/kastengel.jpg">
-<div class="card-content">
-<h3>Kastengel Cheese</h3>
-<div class="price">Rp90.000</div>
-<div class="btn-group">
-<button class="btn cart-btn" onclick="addToCart('Kastengel Cheese',90000,'img/kastengel.jpg')">Add</button>
-<button class="btn detail-btn" onclick="showDetail('Kastengel Cheese',90000,'img/kastengel.jpg')">Detail</button>
-</div>
-</div>
+<?php
+  }
+}else{
+?>
+
+<div class="empty">
+🎁 Belum ada produk spesial. Yuk tambah produk baru!
 </div>
 
-<div class="card">
-<img src="img/putri-salju.jpg">
-<div class="card-content">
-<h3>Putri Salju</h3>
-<div class="price">Rp85.000</div>
-<div class="btn-group">
-<button class="btn cart-btn" onclick="addToCart('Putri Salju',85000,'img/putri-salju.jpg')">Add</button>
-<button class="btn detail-btn" onclick="showDetail('Putri Salju',85000,'img/putri-salju.jpg')">Detail</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/lidah-kucing.jpg">
-<div class="card-content">
-<h3>Lidah Kucing</h3>
-<div class="price">Rp75.000</div>
-<div class="btn-group">
-<button class="btn cart-btn" onclick="addToCart('Lidah Kucing',75000,'img/lidah-kucing.jpg')">Add</button>
-<button class="btn detail-btn" onclick="showDetail('Lidah Kucing',75000,'img/lidah-kucing.jpg')">Detail</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/semprit.jpg">
-<div class="card-content">
-<h3>Kue Semprit</h3>
-<div class="price">Rp70.000</div>
-<div class="btn-group">
-<button class="btn cart-btn" onclick="addToCart('Kue Semprit',70000,'img/semprit.jpg')">Add</button>
-<button class="btn detail-btn" onclick="showDetail('Kue Semprit',70000,'img/semprit.jpg')">Detail</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/sagu.jpg">
-<div class="card-content">
-<h3>Kue Sagu Keju</h3>
-<div class="price">Rp80.000</div>
-<div class="btn-group">
-<button class="btn cart-btn" onclick="addToCart('Kue Sagu Keju',80000,'img/sagu.jpg')">Add</button>
-<button class="btn detail-btn" onclick="showDetail('Kue Sagu Keju',80000,'img/sagu.jpg')">Detail</button>
-</div>
-</div>
-</div>
+<?php } ?>
 
 </div>
 </div>
@@ -293,7 +322,11 @@ body{
 <script>
 
 function getCart(){
-  return JSON.parse(localStorage.getItem("zeyaCart")) || [];
+  let cart = localStorage.getItem("zeyaCart");
+  if(cart){
+    return JSON.parse(cart);
+  }
+  return [];
 }
 
 function saveCart(cart){
@@ -301,37 +334,40 @@ function saveCart(cart){
 }
 
 function addToCart(name, price, image){
-
   let cart = getCart();
-
   let existing = cart.find(item => item.name === name);
-
+  
   if(existing){
     existing.quantity += 1;
-  } else {
-    cart.push({name, price, image, quantity:1});
+  }else{
+    cart.push({
+      name: name,
+      image: image,
+      price: price,
+      quantity: 1
+    });
   }
-
+  
   saveCart(cart);
   updateCartCount();
-
-  window.location.href =
-    "cart-cake.php?name=" + encodeURIComponent(name) +
-    "&price=" + price +
-    "&image=" + encodeURIComponent(image);
+  alert(name + " berhasil ditambahkan ke cart 🛒");
 }
 
 function showDetail(name, price, image){
-  window.location.href =
-    "cart-cake.php?name=" + encodeURIComponent(name) +
-    "&price=" + price +
-    "&image=" + encodeURIComponent(image);
+  let url = "cart-spesial.php?name=" + encodeURIComponent(name) + "&price=" + price + "&image=" + encodeURIComponent(image);
+  window.location.href = url;
 }
 
 function updateCartCount(){
   let cart = getCart();
-  let count = cart.reduce((a,b)=>a+b.quantity,0);
-  document.getElementById("cartCount").innerText = count;
+  let count = 0;
+  for(let i = 0; i < cart.length; i++){
+    count += cart[i].quantity;
+  }
+  let cartCountElem = document.getElementById("cartCount");
+  if(cartCountElem){
+    cartCountElem.innerText = count;
+  }
 }
 
 function goToCart(){
