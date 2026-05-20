@@ -1,4 +1,22 @@
-<?php session_start(); ?>
+<?php
+session_start();
+include "koneksi.php";
+
+if(!$conn){
+  die("Koneksi database gagal: " . mysqli_connect_error());
+}
+
+$data = mysqli_query($conn,"
+SELECT * FROM produk
+WHERE id_kategori = 1
+ORDER BY id_produk DESC
+");
+
+if(!$data){
+  die("Query error: " . mysqli_error($conn));
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -212,6 +230,13 @@ body{
   color:white;
 }
 
+.empty{
+  text-align:center;
+  font-size:22px;
+  color:#6d4348;
+  margin-top:50px;
+}
+
 @media(max-width:1100px){
 
   .grid{
@@ -267,10 +292,6 @@ body{
     <a href="index.php#contact">Contact</a>
   </div>
 
-  <div class="cart-box" onclick="goToCart()">
-    <img src="img/cart.png">
-    <span id="cartCount">0</span>
-  </div>
 
 </div>
 
@@ -283,257 +304,51 @@ body{
 
 <div class="grid">
 
+<?php
+if(mysqli_num_rows($data) > 0){
+  while($d = mysqli_fetch_assoc($data)){
+?>
+
 <div class="card">
-<img src="img/strawberry-shortcake.jpg">
+
+<img src="img/<?= $d['foto']; ?>">
 
 <div class="card-content">
-<h3>Strawberry Shortcake</h3>
-<div class="price">Rp120.000</div>
+
+<h3><?= htmlspecialchars($d['nama_kue']); ?></h3>
+
+<div class="price">
+Rp<?= number_format($d['harga']); ?>
+</div>
 
 <div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Strawberry Shortcake',120000,'img/strawberry-shortcake.jpg')">
+
+<button
+class="btn cart-btn"
+onclick='addToCart("<?= htmlspecialchars($d['nama_kue']); ?>", <?= $d['harga']; ?>, "img/<?= $d['foto']; ?>")'>
 Add To Cart
 </button>
 
-<button class="btn detail-btn"
-onclick="showDetail('Strawberry Shortcake',120000,'img/strawberry-shortcake.jpg')">
+<button
+class="btn detail-btn"
+onclick='showDetail("<?= htmlspecialchars($d['nama_kue']); ?>", <?= $d['harga']; ?>, "img/<?= $d['foto']; ?>")'>
 Detail
 </button>
+
 </div>
 </div>
 </div>
 
-<div class="card">
-<img src="img/mango-cake.jpg">
+<?php
+  }
+}else{
+?>
 
-<div class="card-content">
-<h3>Mango Delight Cake</h3>
-<div class="price">Rp125.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Mango Delight Cake',125000,'img/mango-cake.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Mango Delight Cake',125000,'img/mango-cake.jpg')">
-Detail
-</button>
-</div>
-</div>
+<div class="empty">
+🍰 Belum ada produk cake. Yuk tambah produk baru!
 </div>
 
-<div class="card">
-<img src="img/mixed-fruit-cake.jpg">
-
-<div class="card-content">
-<h3>Mixed Fruit Cake</h3>
-<div class="price">Rp130.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Mixed Fruit Cake',130000,'img/mixed-fruit-cake.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Mixed Fruit Cake',130000,'img/mixed-fruit-cake.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/choco-fudge.jpg">
-
-<div class="card-content">
-<h3>Chocolate Fudge Cake</h3>
-<div class="price">Rp135.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Chocolate Fudge Cake',135000,'img/choco-fudge.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Chocolate Fudge Cake',135000,'img/choco-fudge.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/dark-choco.jpg">
-
-<div class="card-content">
-<h3>Dark Chocolate Cake</h3>
-<div class="price">Rp140.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Dark Chocolate Cake',140000,'img/dark-choco.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Dark Chocolate Cake',140000,'img/dark-choco.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/lava-cake.jpg">
-
-<div class="card-content">
-<h3>Choco Lava Cake</h3>
-<div class="price">Rp130.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Choco Lava Cake',130000,'img/lava-cake.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Choco Lava Cake',130000,'img/lava-cake.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/vanilla-cake.jpg">
-
-<div class="card-content">
-<h3>Vanilla Cream Cake</h3>
-<div class="price">Rp120.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Vanilla Cream Cake',120000,'img/vanilla-cake.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Vanilla Cream Cake',120000,'img/vanilla-cake.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/black-forest.jpg">
-
-<div class="card-content">
-<h3>Black Forest Cake</h3>
-<div class="price">Rp135.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Black Forest Cake',135000,'img/black-forest.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Black Forest Cake',135000,'img/black-forest.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/red-velvet.jpg">
-
-<div class="card-content">
-<h3>Red Velvet Cake</h3>
-<div class="price">Rp140.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Red Velvet Cake',140000,'img/red-velvet.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Red Velvet Cake',140000,'img/red-velvet.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/classic-cheese.jpg">
-
-<div class="card-content">
-<h3>Classic Cheesecake</h3>
-<div class="price">Rp130.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Classic Cheesecake',130000,'img/classic-cheese.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Classic Cheesecake',130000,'img/classic-cheese.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/matcha-cheese.jpg">
-
-<div class="card-content">
-<h3>Matcha Cheesecake</h3>
-<div class="price">Rp135.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Matcha Cheesecake',135000,'img/matcha-cheese.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Matcha Cheesecake',135000,'img/matcha-cheese.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
-
-<div class="card">
-<img src="img/biscoff-cheese.jpg">
-
-<div class="card-content">
-<h3>Lotus Biscoff Cheesecake</h3>
-<div class="price">Rp140.000</div>
-
-<div class="btn-group">
-<button class="btn cart-btn"
-onclick="addToCart('Lotus Biscoff Cheesecake',140000,'img/biscoff-cheese.jpg')">
-Add To Cart
-</button>
-
-<button class="btn detail-btn"
-onclick="showDetail('Lotus Biscoff Cheesecake',140000,'img/biscoff-cheese.jpg')">
-Detail
-</button>
-</div>
-</div>
-</div>
+<?php } ?>
 
 </div>
 </div>
@@ -541,7 +356,11 @@ Detail
 <script>
 
 function getCart(){
-  return JSON.parse(localStorage.getItem("zeyaCart")) || [];
+  let cart = localStorage.getItem("zeyaCart");
+  if(cart){
+    return JSON.parse(cart);
+  }
+  return [];
 }
 
 function saveCart(cart){
@@ -549,57 +368,47 @@ function saveCart(cart){
 }
 
 function addToCart(name, price, image){
-
   let cart = getCart();
-
   let existing = cart.find(item => item.name === name);
-
+  
   if(existing){
     existing.quantity += 1;
   }else{
     cart.push({
-      name:name,
-      image:image,
-      price:price,
-      quantity:1
+      name: name,
+      image: image,
+      price: price,
+      quantity: 1
     });
   }
-
+  
   saveCart(cart);
-
   updateCartCount();
-
   alert(name + " berhasil ditambahkan ke cart 🛒");
-
 }
 
 function showDetail(name, price, image){
-
-  let url = "cart-cake.php?name="
-          + encodeURIComponent(name)
-          + "&price=" + price
-          + "&image=" + encodeURIComponent(image);
-
+  let url = "cart-cake.php?name=" + encodeURIComponent(name) + "&price=" + price + "&image=" + encodeURIComponent(image);
   window.location.href = url;
-
 }
 
 function updateCartCount(){
-
   let cart = getCart();
-
-  let count = cart.reduce((sum,item)=> sum + item.quantity,0);
-
-  document.getElementById("cartCount").innerText = count;
-
+  let count = 0;
+  for(let i = 0; i < cart.length; i++){
+    count += cart[i].quantity;
+  }
+  let cartCountElem = document.getElementById("cartCount");
+  if(cartCountElem){
+    cartCountElem.innerText = count;
+  }
 }
 
 function goToCart(){
-
   window.location.href = "cart.php";
-
 }
 
+// Panggil updateCartCount saat halaman loading
 updateCartCount();
 
 </script>
